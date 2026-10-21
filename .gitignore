@@ -1,0 +1,10 @@
+
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+careerpilot.db
+instance/
+.pytest_cache/
+

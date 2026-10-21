@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CareerPilot AI | Resume Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{{ url_for('index') }}">CareerPilot <span>AI</span></a>
+  <nav>
+    <a href="{{ url_for('index') }}">Resume Analyzer</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('history') }}">History</a>
+  </nav>
+</header>
+<main class="container">
+  <section class="hero">
+    <p class="eyebrow">YOUR CAREER, YOUR NEXT STEP</p>
+    <h1>Make your resume work <span>smarter.</span></h1>
+    <p>Compare your resume with a job description, identify skill gaps, and prepare for interviews.</p>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% if error %}<div class="alert error">{{ error }}</div>{% endif %}
+
+  <section class="panel">
+    <h2>Analyze your resume</h2>
+    <p class="muted">Upload a text-based PDF (maximum 5 MB) and paste the job description.</p>
+    <form method="post" enctype="multipart/form-data">
+      <label for="resume">Resume PDF</label>
+      <input id="resume" type="file" name="resume" accept=".pdf,application/pdf" required>
+      <label for="job_description">Job description</label>
+      <textarea id="job_description" name="job_description" rows="8" placeholder="Paste the job description here..." required>{{ job_description or '' }}</textarea>
+      <button type="submit">Analyze resume</button>
+    </form>
+  </section>
+
+  {% if result %}
+  <section class="panel">
+    <div class="result-heading">
+      <div>
+        <p class="eyebrow">YOUR RESULT</p>
+        <h2>Resume match overview</h2>
+      </div>
+      <div class="score">{{ result.score }}<small>% match</small></div>
+    </div>
+    <div class="progress"><div style="width: {{ result.score }}%"></div></div>
+    <div class="stats">
+      <div class="stat"><strong>{{ result.matched|length }}</strong><span>Matched skills</span></div>
+      <div class="stat"><strong>{{ result.missing|length }}</strong><span>Missing skills</span></div>
+      <div class="stat"><strong>{{ result.job_skill_count }}</strong><span>Skills detected in job</span></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <h3>Matched skills</h3>
+        {% if result.matched %}<div class="chips">{% for skill in result.matched %}<span class="chip good">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No matching skills detected yet.</p>{% endif %}
+      </div>
+      <div>
+        <h3>Skills to review</h3>
+        {% if result.missing %}<div class="chips">{% for skill in result.missing %}<span class="chip warn">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No missing skills detected from the available skill list.</p>{% endif %}
+      </div>
+    </div>
+    <h3>Suggestions</h3>
+    <ul>{% for item in result.suggestions %}<li>{{ item }}</li>{% endfor %}</ul>
+    <h3>Interview practice questions</h3>
+    <ol>{% for question in questions %}<li>{{ question }}</li>{% endfor %}</ol>
+    <h3>AI career feedback</h3>
+    <div class="feedback">{{ ai_feedback or 'AI feedback not available.' }}</div>
+    <form method="post" action="{{ url_for('download_report') }}" class="report-form">
+      <input type="hidden" name="score" value="{{ result.score }}">
+      {% for item in result.matched %}<input type="hidden" name="matched" value="{{ item }}">{% endfor %}
+      {% for item in result.missing %}<input type="hidden" name="missing" value="{{ item }}">{% endfor %}
+      {% for item in result.suggestions %}<input type="hidden" name="suggestions" value="{{ item }}">{% endfor %}
+      {% for item in questions %}<input type="hidden" name="questions" value="{{ item }}">{% endfor %}
+      <input type="hidden" name="ai_feedback" value="{{ ai_feedback or 'Not available' }}">
+      <button type="submit" class="secondary">Download PDF report</button>
+    </form>
+  </section>
+  {% endif %}
+  <p class="disclaimer">This tool checks for selected keywords and offers guidance. It is not an official ATS score or a hiring decision.</p>
+</main>
+<footer>CareerPilot AI · Resume analysis and interview preparation</footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analysis Details | CareerPilot AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{{ url_for('index') }}">CareerPilot <span>AI</span></a>
+  <nav><a href="{{ url_for('index') }}">Resume Analyzer</a><a href="{{ url_for('dashboard') }}">Dashboard</a><a href="{{ url_for('history') }}">History</a></nav>
+</header>
+<main class="container">
+  <section class="hero compact"><p class="eyebrow">{{ item.created_at }}</p><h1>Analysis details</h1><p>{{ item.job_description }}</p></section>
+  <section class="panel">
+    <div class="result-heading"><h2>Match score</h2><div class="score">{{ item.score }}<small>% match</small></div></div>
+    <h3>Matched skills</h3>{% if item.matched_skills %}<div class="chips">{% for skill in item.matched_skills %}<span class="chip good">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No matched skills saved.</p>{% endif %}
+    <h3>Missing skills</h3>{% if item.missing_skills %}<div class="chips">{% for skill in item.missing_skills %}<span class="chip warn">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No missing skills saved.</p>{% endif %}
+    <h3>Suggestions</h3><ul>{% for x in item.suggestions %}<li>{{ x }}</li>{% else %}<li>No suggestions saved.</li>{% endfor %}</ul>
+    <h3>Interview questions</h3><ol>{% for x in item.questions %}<li>{{ x }}</li>{% else %}<li>No questions saved.</li>{% endfor %}</ol>
+    <h3>AI feedback</h3><div class="feedback">{{ item.ai_feedback }}</div>
+    <p><a class="button-link" href="{{ url_for('history') }}">Back to history</a></p>
+  </section>
+</main>
+<footer>CareerPilot AI · Analysis details</footer>
+</body>
+</html>
